@@ -1,4 +1,4 @@
-package com.example.facialrecognition;
+package com.autozone.facialrecognition;
 
 import org.junit.Test;
 
