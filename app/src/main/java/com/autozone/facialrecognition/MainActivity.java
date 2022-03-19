@@ -5,6 +5,9 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
+import android.graphics.PointF;
+import android.graphics.Rect;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -26,15 +29,21 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.face.Face;
+import com.google.mlkit.vision.face.FaceContour;
 import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
+import com.google.mlkit.vision.face.FaceLandmark;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
-public class MainActivity extends AppCompatActivity implements ImageAnalysis.Analyzer, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     PreviewView previewView;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
@@ -58,8 +67,9 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
 
         FaceDetectorOptions options = new FaceDetectorOptions.Builder()
                 .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
-                .setContourMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
-                .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_NONE)
+                .setContourMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
+                .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+                .enableTracking()
                 .build();
 
         faceDetector = FaceDetection.getClient(options);
@@ -103,8 +113,8 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
     private void startCameraX(ProcessCameraProvider cameraProvider) {
         cameraProvider.unbindAll();
         CameraSelector cameraSelector = new CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-//                .requireLensFacing(CameraSelector.LENS_FACING_FRONT)          This should be uncommented and the above line should be commented for our app, but for testing purposes this is easier to work with.
+//                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .requireLensFacing(CameraSelector.LENS_FACING_FRONT)          //This should be uncommented and the above line should be commented for our app, but for testing purposes this is easier to work with.
                 .build();
         Preview preview = new Preview.Builder()
                 .build();
@@ -115,15 +125,59 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
-        imageAnalysis.setAnalyzer(getExecutor(), this);
-        cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
+
+        imageAnalysis.setAnalyzer(getExecutor(), image -> {
+            Log.d("TAG", "Analyzer: Frame found at: " + image.getImageInfo().getTimestamp());
+            @SuppressLint("UnsafeOptInUsageError") Image mediaImage = image.getImage();
+            if (mediaImage != null) {
+                InputImage inputImage = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
+                Log.d("TAG", String.valueOf(image.getImageInfo().getRotationDegrees()));
+                Task<List<Face>> result =
+                        faceDetector.process(inputImage)
+                                .addOnSuccessListener(
+                                        faces -> {
+                                            for (Face face : faces) {
+                                                Rect bounds = face.getBoundingBox();
+                                                float rotY = face.getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
+                                                float rotZ = face.getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
+
+                                                // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
+                                                // nose available):
+                                                FaceLandmark leftEar = face.getLandmark(FaceLandmark.LEFT_EAR);
+                                                if (leftEar != null) {
+                                                    PointF leftEarPos = leftEar.getPosition();
+                                                }
+
+                                                // If contour detection was enabled:
+                                                List<PointF> leftEyeContour =
+                                                        face.getContour(FaceContour.LEFT_EYE).getPoints();
+                                                List<PointF> upperLipBottomContour =
+                                                        face.getContour(FaceContour.UPPER_LIP_BOTTOM).getPoints();
+
+                                                // If classification was enabled:
+                                                if (face.getSmilingProbability() != null) {
+                                                    float smileProb = face.getSmilingProbability();
+                                                }
+                                                if (face.getRightEyeOpenProbability() != null) {
+                                                    float rightEyeOpenProb = face.getRightEyeOpenProbability();
+                                                }
+
+                                                // If face tracking was enabled:
+                                                if (face.getTrackingId() != null) {
+                                                    int id = face.getTrackingId();
+                                                }
+                                                Log.d("TAG", "Bpimds " + bounds);
+                                            }
+                                        })
+                                .addOnFailureListener(Throwable::printStackTrace)
+                                .addOnCompleteListener(x -> image.close());
+                Log.d("TAG", "Result " + result);
+            }
+        });
+
+        cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
     }
 
-    @Override
-    public void analyze(@NonNull ImageProxy image) {
-        Log.d("TAG", "Analyzer: Frame found at: " + image.getImageInfo().getTimestamp());
-        image.close();
-    }
 
     @SuppressLint({"RestrictedApi", "NonConstantResourceId"})
     @Override
