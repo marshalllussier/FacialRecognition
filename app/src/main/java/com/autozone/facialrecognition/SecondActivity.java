@@ -3,23 +3,21 @@ package com.autozone.facialrecognition;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
-import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -38,6 +36,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class SecondActivity extends AppCompatActivity {
+    Toolbar toolbar;
     PreviewView previewView;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
@@ -73,10 +72,13 @@ public class SecondActivity extends AppCompatActivity {
 
     public void openCamera() {
         previewView = findViewById(R.id.previewView);
-//        Button bCapture = findViewById(R.id.bCapture);
-//        bCapture.setText("CAPTURE PHOTO");        the bCapture Button can be manipulated manually through code as well as in the res layout
-
-//        bCapture.setOnClickListener(this);
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Open up options tab
+            }
+        });
 
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
@@ -140,57 +142,10 @@ public class SecondActivity extends AppCompatActivity {
                                         })
                                 .addOnFailureListener(Throwable::printStackTrace)
                                 .addOnCompleteListener(task -> image.close());
-//                                .addOnCompleteListener(x -> image.close());
                 Log.d("TAG", "Result " + result);
             }
         });
 
         cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
     }
-
-
-//    @SuppressLint({"RestrictedApi", "NonConstantResourceId"})
-//    @Override
-//    public void onClick(View view) {
-//        switch (view.getId()) {
-//            case R.id.bCapture:
-//                capturePhoto();
-//                break;
-//        }
-//    }
-
-
-    private void capturePhoto() {
-        long timestamp = System.currentTimeMillis();
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, timestamp);
-        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
-
-
-        imageCapture.takePicture(
-                new ImageCapture.OutputFileOptions.Builder(
-                        getContentResolver(),
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        contentValues
-                ).build(),
-                getExecutor(),
-                new ImageCapture.OnImageSavedCallback() {
-                    @Override
-                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                        Toast.makeText(SecondActivity.this, "Photo has been saved.", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onError(@NonNull ImageCaptureException exception) {
-                        Toast.makeText(SecondActivity.this, "ERROR: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
-
-    }
 }
-
-
-
-

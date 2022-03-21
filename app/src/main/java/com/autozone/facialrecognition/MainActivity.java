@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText Password;
     private TextView Info;
     private Button Login;
+    private android.widget.Toolbar toolbar;
     private int counter = 5;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -24,6 +25,13 @@ public class MainActivity extends AppCompatActivity {
         Password = (EditText)findViewById(R.id.etPassword);
         Login = (Button)findViewById(R.id.btnLogin);
         Info = (TextView)findViewById(R.id.tvInfo);
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Open up options tab
+            }
+        });
         Info.setText("Number of attempts remaining: 5");
         Login.setOnClickListener(new View.OnClickListener() {
             @Override
