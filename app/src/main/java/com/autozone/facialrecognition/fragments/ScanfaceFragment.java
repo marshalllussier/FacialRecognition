@@ -1,20 +1,19 @@
-package com.autozone.facialrecognition;
-
+package com.autozone.facialrecognition.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.media.Image;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
@@ -22,7 +21,10 @@ import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
+import com.autozone.facialrecognition.R;
+import com.autozone.facialrecognition.ShowFaceBox;
 import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.common.InputImage;
@@ -35,8 +37,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
-public class SecondActivity extends AppCompatActivity {
-    Toolbar toolbar;
+public class ScanfaceFragment extends Fragment {
     PreviewView previewView;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
@@ -44,14 +45,14 @@ public class SecondActivity extends AppCompatActivity {
     String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
     public static boolean hasPerms = true;
 
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_second);
+        System.out.println("scanfacefragment has been called on create");
         for (String permission : permissions) {
-            hasPerms = ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+            System.out.println("requesting perms");
+            hasPerms = ContextCompat.checkSelfPermission(requireActivity(), permission) == PackageManager.PERMISSION_GRANTED;
         }
         if (hasPerms) {
             openCamera();
@@ -68,19 +69,14 @@ public class SecondActivity extends AppCompatActivity {
                 .build();
 
         faceDetector = FaceDetection.getClient(options);
+        View view = inflater.inflate(R.layout.fragment_scan_face, container, false);
+        previewView = view.findViewById(R.id.previewView);
+        return view;
     }
 
     public void openCamera() {
-        previewView = findViewById(R.id.previewView);
-        toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Open up options tab
-            }
-        });
 
-        cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+        cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity());
         cameraProviderFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
@@ -98,14 +94,15 @@ public class SecondActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();
             } else {
-                Toast.makeText(SecondActivity.this, "Insufficient Permissions", Toast.LENGTH_LONG).show();
+                Toast.makeText(requireActivity(), "Insufficient Permissions", Toast.LENGTH_LONG).show();
             }
         }
     }
 
     Executor getExecutor() {
-        return ContextCompat.getMainExecutor(this);
+        return ContextCompat.getMainExecutor(requireActivity());
     }
+
 
     @SuppressLint("RestrictedApi")
     private void startCameraX(ProcessCameraProvider cameraProvider) {
@@ -133,10 +130,10 @@ public class SecondActivity extends AppCompatActivity {
                                 .addOnSuccessListener(
                                         faces -> {
                                             for (Face face : faces) {
-                                                System.out.println("FACE BOX: "  + face.getBoundingBox());
+                                                System.out.println("FACE DETECTED, DRAWING BOX AT: "  + face.getBoundingBox());
 
                                                 Rect bounds = face.getBoundingBox();
-                                                ShowFaceBox faceBox = new ShowFaceBox(this, bounds);
+                                                ShowFaceBox faceBox = new ShowFaceBox(requireActivity(), bounds);
                                                 previewView.addView(faceBox);
                                             }
                                         })

@@ -1,56 +1,75 @@
 package com.autozone.facialrecognition;
 
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
-public class MainActivity extends AppCompatActivity {
-    private EditText Name;
-    private EditText Password;
-    private TextView Info;
-    private Button Login;
-    private android.widget.Toolbar toolbar;
-    private int counter = 5;
+import com.autozone.facialrecognition.fragments.AlternateloginFragment;
+import com.autozone.facialrecognition.fragments.LoginhistoryFragment;
+import com.autozone.facialrecognition.fragments.ScanfaceFragment;
+import com.autozone.facialrecognition.fragments.SettingsFragment;
+import com.google.android.material.navigation.NavigationView;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private DrawerLayout drawer;
+    private Toolbar toolbar;
+    public static boolean isLoggedIn;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Name = (EditText)findViewById(R.id.etName);
-        Password = (EditText)findViewById(R.id.etPassword);
-        Login = (Button)findViewById(R.id.btnLogin);
-        Info = (TextView)findViewById(R.id.tvInfo);
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Open up options tab
-            }
-        });
-        Info.setText("Number of attempts remaining: 5");
-        Login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                validate(Name.getText().toString(), Password.getText().toString());
-            }
-        });
+        setSupportActionBar(toolbar);
+
+        drawer = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ScanfaceFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_scan_face);
+        }
     }
-    private void validate(String userName, String userPassword){
-        if(userName.equals("admin") && userPassword.equals("admin")){
-            Intent intent = new Intent(MainActivity.this, SecondActivity.class);
-            startActivity(intent);
+
+    @Override
+    public void onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+            return;
         }
-        else{
-            counter--;
-            Info.setText("Number of attempts remaining: " + String.valueOf(counter));
-            if(counter == 0){
-                Login.setEnabled(false);
-            }
+        super.onBackPressed();
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.nav_scan_face:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ScanfaceFragment()).commit();
+                break;
+            case R.id.nav_alternate_login:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AlternateloginFragment()).commit();
+                break;
+            case R.id.nav_settings:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commit();
+                break;
+            case R.id.nav_login_history:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LoginhistoryFragment()).commit();
+                break;
         }
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }

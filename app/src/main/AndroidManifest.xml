@@ -15,19 +15,10 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
             android:name="com.autozone.facialrecognition.MainActivity"
-            android:label="Preferences" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.autozone.facialrecognition.SecondActivity"
-            android:exported="true"
+            android:theme="@style/AppTheme.NoActionBar"
             android:label="Facial Recognition" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
