@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.autozone.facialrecognition.MainActivity;
 import com.autozone.facialrecognition.R;
 
 public class AlternateloginFragment extends Fragment {
@@ -41,13 +42,12 @@ public class AlternateloginFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     private void validate(String userName, String userPassword){
-        if(userName.equals("admin") && userPassword.equals("admin")){
+        if(userName.equals("admin") && userPassword.equals("admin")){ // temporary
             Toast.makeText(requireActivity(), "Unlock device", Toast.LENGTH_LONG).show();
-
-//            menu.findItem(R.id.nav_login_history).setVisible(true);
-
-//            Intent intent = new Intent(MainActivity.this, SecondActivity.class);
-//            startActivity(intent);
+            System.out.println("fffffff " + getActivity().toString());
+            MainActivity activity = (MainActivity) getActivity();
+            activity.setLoginVisible();
+                // set the visibility of "login history" option to True
         }
         else{
             counter--;
