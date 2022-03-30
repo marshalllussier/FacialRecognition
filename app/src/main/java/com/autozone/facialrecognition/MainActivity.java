@@ -1,8 +1,12 @@
 package com.autozone.facialrecognition;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +17,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.autozone.facialrecognition.fragments.AlternateloginFragment;
+import com.autozone.facialrecognition.fragments.CreateprofileFragment;
 import com.autozone.facialrecognition.fragments.LoginhistoryFragment;
 import com.autozone.facialrecognition.fragments.ScanfaceFragment;
 import com.autozone.facialrecognition.fragments.SettingsFragment;
@@ -68,12 +73,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_login_history:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LoginhistoryFragment()).commit();
                 break;
+            case R.id.nav_create_profile:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CreateprofileFragment()).commit();
+                break;
+            case R.id.nav_support:
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + getString(R.string.support_number)));
+                startActivity(intent);
+                break;
+            case R.id.nav_logout:
+//                set_user_logged_in(false);   // This needs menu fixed first, currently it must be manually reset.
+                break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    public void setLoginVisible() {
-        navigationView.getMenu().findItem(R.id.nav_login_history).setVisible(true);
+    public void set_user_logged_in(boolean loggedOn) {
+        Menu menu = navigationView.getMenu();
+        menu.findItem(R.id.nav_login_history).setVisible(loggedOn);
+        menu.findItem(R.id.nav_settings).setVisible(loggedOn);
+        menu.findItem(R.id.nav_create_profile).setVisible(loggedOn);
+        menu.findItem(R.id.nav_logout).setVisible(loggedOn);
+
+        menu.findItem(R.id.nav_alternate_login).setVisible(!loggedOn);
     }
 }

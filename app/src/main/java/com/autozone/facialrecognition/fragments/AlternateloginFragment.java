@@ -44,10 +44,8 @@ public class AlternateloginFragment extends Fragment {
     private void validate(String userName, String userPassword){
         if(userName.equals("admin") && userPassword.equals("admin")){ // temporary
             Toast.makeText(requireActivity(), "Unlock device", Toast.LENGTH_LONG).show();
-            System.out.println("fffffff " + getActivity().toString());
             MainActivity activity = (MainActivity) getActivity();
-            activity.setLoginVisible();
-                // set the visibility of "login history" option to True
+            activity.set_user_logged_in(true);
         }
         else{
             counter--;

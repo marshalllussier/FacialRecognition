@@ -6,23 +6,12 @@
     android:gravity="bottom"
     android:padding="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
-    android:layout_height="176dp">
+    android:layout_height="126dp">
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher_round"/>
+        android:layout_height="91dp"
+        android:src="@drawable/ic_logo" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:text="@string/app_name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="AutoZoner Login" />
 
 </LinearLayout>

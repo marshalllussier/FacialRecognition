@@ -7,7 +7,7 @@
         <item
             android:id="@+id/nav_scan_face"
             android:icon="@drawable/ic_scan_face"
-            android:title="Scan face" />
+            android:title="Login with Face" />
 
         <item
             android:id="@+id/nav_alternate_login"
@@ -17,7 +17,8 @@
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings"
-            android:title="Settings" />
+            android:title="Profile Settings"
+            android:visible="false" />
 
         <item
             android:id="@+id/nav_login_history"
@@ -25,5 +26,23 @@
             android:title="Login History"
             android:visible="false"/>
 
+        <item
+            android:id="@+id/nav_create_profile"
+            android:icon="@drawable/ic_create_profile"
+            android:title="Create Facial Profile"
+            android:visible="false"/>
+
     </group>
+
+    <item android:title="@string/app_name">
+        <menu>
+            <item android:id="@+id/nav_support"
+                android:icon="@drawable/ic_support"
+                android:title="Contact support" />
+            <item android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_logout"
+                android:title="Logout"
+                android:visible="false"/>
+        </menu>
+    </item>
 </menu>
