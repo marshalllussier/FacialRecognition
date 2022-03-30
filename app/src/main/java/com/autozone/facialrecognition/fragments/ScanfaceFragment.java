@@ -135,6 +135,7 @@ public class ScanfaceFragment extends Fragment {
                                                 Rect bounds = face.getBoundingBox();
                                                 ShowFaceBox faceBox = new ShowFaceBox(requireActivity(), bounds);
                                                 previewView.addView(faceBox);
+                                                //            activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LoginhistoryFragment()).commit(); // This will redirect to a different fragment upon successful login
                                             }
                                         })
                                 .addOnFailureListener(Throwable::printStackTrace)

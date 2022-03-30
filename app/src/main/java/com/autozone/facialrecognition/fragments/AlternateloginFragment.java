@@ -46,6 +46,7 @@ public class AlternateloginFragment extends Fragment {
             Toast.makeText(requireActivity(), "Unlock device", Toast.LENGTH_LONG).show();
             MainActivity activity = (MainActivity) getActivity();
             activity.set_user_logged_in(true);
+            activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LoginhistoryFragment()).commit(); // This will redirect to a different fragment upon successful login
         }
         else{
             counter--;

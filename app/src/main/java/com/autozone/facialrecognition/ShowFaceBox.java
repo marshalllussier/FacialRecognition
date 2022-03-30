@@ -21,7 +21,7 @@ public class ShowFaceBox extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        paint.setColor(Color.BLACK);
+        paint.setColor(getResources().getColor(R.color.autozoneSecondary));
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(4);
         rectangle_box.bottom*=1.5;

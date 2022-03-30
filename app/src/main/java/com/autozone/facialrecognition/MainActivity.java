@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         menu.findItem(R.id.nav_create_profile).setVisible(loggedOn);
         menu.findItem(R.id.nav_logout).setVisible(loggedOn);
 
+        menu.findItem(R.id.nav_scan_face).setVisible(!loggedOn);
         menu.findItem(R.id.nav_alternate_login).setVisible(!loggedOn);
     }
 }
