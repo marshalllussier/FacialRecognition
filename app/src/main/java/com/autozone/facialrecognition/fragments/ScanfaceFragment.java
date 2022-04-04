@@ -3,12 +3,8 @@ package com.autozone.facialrecognition.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.graphics.Point;
-import android.graphics.PointF;
-import android.graphics.Rect;
 import android.media.Image;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,25 +21,21 @@ import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.autozone.facialrecognition.detection.DrawType;
+import com.autozone.facialrecognition.detection.FaceAnalyzer;
 import com.autozone.facialrecognition.R;
-import com.autozone.facialrecognition.ShowContourPoint;
-import com.autozone.facialrecognition.ShowFaceBox;
-import com.google.android.gms.tasks.Task;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.face.Face;
-import com.google.mlkit.vision.face.FaceContour;
 import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class ScanfaceFragment extends Fragment {
     PreviewView previewView;
-    private int faceDrawType = 1;   // 0 for boundary box, 1 for contour points
+    private DrawType faceDrawType = DrawType.BOUNDARY_BOX;   // 0 for boundary box, 1 for contour points
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
     private FaceDetector faceDetector;
@@ -129,24 +121,7 @@ public class ScanfaceFragment extends Fragment {
             if (mediaImage != null) {
                 InputImage inputImage = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
                 faceDetector.process(inputImage)
-                        .addOnSuccessListener(
-                                faces -> {
-                                    for (Face face : faces) {
-                                        if (faceDrawType == 0) {
-                                            Rect bounds = face.getBoundingBox();
-                                            ShowFaceBox faceBox = new ShowFaceBox(requireActivity(), bounds);           // DRAW FACE BOX
-                                            previewView.addView(faceBox);
-                                        } else {
-                                            for (FaceContour faceContour : face.getAllContours()) {               // DRAW CONTOUR POINTS
-                                                for (PointF point : faceContour.getPoints()) {
-                                                    ShowContourPoint faceBox = new ShowContourPoint(requireActivity(), point);
-                                                    previewView.addView(faceBox);
-                                                }
-                                            }
-                                        }
-//                                                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LoginhistoryFragment()).commit(); // This will redirect to a different fragment upon successful login
-                                    }
-                                })
+                        .addOnSuccessListener(new FaceAnalyzer(requireActivity(), previewView, faceDrawType))
                         .addOnFailureListener(Throwable::printStackTrace)
                         .addOnCompleteListener(task -> image.close());
             }
