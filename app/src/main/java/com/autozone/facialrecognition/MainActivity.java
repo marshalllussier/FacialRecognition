@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ScanfaceFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_scan_face);
         }
+        set_user_logged_in(false);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(intent);
                 break;
             case R.id.nav_logout:
-//                set_user_logged_in(false);   // This needs menu fixed first, currently it must be manually reset.
+                set_user_logged_in(false);   // This needs menu fixed first, currently it must be manually reset.
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
@@ -91,12 +91,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void set_user_logged_in(boolean loggedOn) {
         Menu menu = navigationView.getMenu();
-        menu.findItem(R.id.nav_login_history).setVisible(loggedOn);
-        menu.findItem(R.id.nav_settings).setVisible(loggedOn);
-        menu.findItem(R.id.nav_create_profile).setVisible(loggedOn);
         menu.findItem(R.id.nav_logout).setVisible(loggedOn);
-
-        menu.findItem(R.id.nav_scan_face).setVisible(!loggedOn);
-        menu.findItem(R.id.nav_alternate_login).setVisible(!loggedOn);
+        menu.setGroupVisible(R.id.navigation_loggedin_activities, loggedOn);
+        menu.findItem(R.id.nav_scan_face).setVisible(loggedOn);
+        menu.findItem(R.id.nav_alternate_login).setVisible(loggedOn);
+        menu.setGroupVisible(R.id.navigation_loggedout_activities, !loggedOn);
     }
 }

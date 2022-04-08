@@ -35,7 +35,7 @@ import java.util.concurrent.Executor;
 
 public class ScanfaceFragment extends Fragment {
     PreviewView previewView;
-    private DrawType faceDrawType = DrawType.BOUNDARY_BOX;   // 0 for boundary box, 1 for contour points
+    private final DrawType faceDrawType = DrawType.BOUNDARY_BOX;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
     private FaceDetector faceDetector;
@@ -121,7 +121,7 @@ public class ScanfaceFragment extends Fragment {
             if (mediaImage != null) {
                 InputImage inputImage = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
                 faceDetector.process(inputImage)
-                        .addOnSuccessListener(new FaceAnalyzer(requireActivity(), previewView, faceDrawType))
+                        .addOnSuccessListener((new FaceAnalyzer(this, requireActivity(), previewView, faceDrawType)))
                         .addOnFailureListener(Throwable::printStackTrace)
                         .addOnCompleteListener(task -> image.close());
             }

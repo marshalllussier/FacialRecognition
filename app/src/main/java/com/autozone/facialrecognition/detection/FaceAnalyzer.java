@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import androidx.camera.view.PreviewView;
 import androidx.fragment.app.FragmentActivity;
 
+import com.autozone.facialrecognition.fragments.ScanfaceFragment;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.mlkit.vision.face.Face;
 import com.google.mlkit.vision.face.FaceContour;
@@ -13,11 +14,13 @@ import com.google.mlkit.vision.face.FaceContour;
 import java.util.List;
 
 public class FaceAnalyzer implements OnSuccessListener<List<Face>> {
+    private ScanfaceFragment scanfaceFragment;
     private FragmentActivity activity;
     private DrawType faceDrawType;
     private PreviewView previewView;
 
-    public FaceAnalyzer(FragmentActivity activity, PreviewView previewView, DrawType faceDrawType) {
+    public FaceAnalyzer(ScanfaceFragment scanfaceFragment, FragmentActivity activity, PreviewView previewView, DrawType faceDrawType) {
+        this.scanfaceFragment = scanfaceFragment;
         this.activity = activity;
         this.previewView = previewView;
         this.faceDrawType = faceDrawType;
@@ -34,12 +37,14 @@ public class FaceAnalyzer implements OnSuccessListener<List<Face>> {
                 } else {
                     for (FaceContour faceContour : face.getAllContours()) {               // DRAW CONTOUR POINTS
                         for (PointF point : faceContour.getPoints()) {
-                            ShowContourPoint faceBox = new ShowContourPoint(activity, point);
-                            previewView.addView(faceBox);
+                            ShowContourPoint contours = new ShowContourPoint(activity, point);
+                            previewView.addView(contours);
+
                         }
                     }
                 }
 //                                                            activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LoginhistoryFragment()).commit(); // This will redirect to a different fragment upon successful login
             }
     }
+
 }
