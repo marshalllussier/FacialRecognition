@@ -121,9 +121,8 @@ public class ScanfaceFragment extends Fragment {
             if (mediaImage != null) {
                 InputImage inputImage = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
                 faceDetector.process(inputImage)
-                        .addOnSuccessListener((new FaceAnalyzer(this, requireActivity(), previewView, faceDrawType)))
-                        .addOnFailureListener(Throwable::printStackTrace)
-                        .addOnCompleteListener(task -> image.close());
+                        .addOnSuccessListener((new FaceAnalyzer(this, requireActivity(), previewView, faceDrawType, inputImage, image)))
+                        .addOnFailureListener(Throwable::printStackTrace);
             }
         });
 

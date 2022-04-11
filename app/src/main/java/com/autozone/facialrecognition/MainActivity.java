@@ -93,8 +93,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.nav_logout).setVisible(loggedOn);
         menu.setGroupVisible(R.id.navigation_loggedin_activities, loggedOn);
-        menu.findItem(R.id.nav_scan_face).setVisible(loggedOn);
-        menu.findItem(R.id.nav_alternate_login).setVisible(loggedOn);
         menu.setGroupVisible(R.id.navigation_loggedout_activities, !loggedOn);
     }
 }
