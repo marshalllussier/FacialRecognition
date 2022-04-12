@@ -3,9 +3,12 @@ package com.autozone.facialrecognition;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Logon {
     private String username;
@@ -29,6 +32,26 @@ public class Logon {
         }
         catch (IOException exc) {
             Log.e("Exception", "File write failed: " + exc);
+        }
+    }
+
+    public String getLastLogon() {
+        File path = context.getFilesDir();
+        File readFrom = new File(path, "log_file.txt");
+        try {
+            InputStreamReader streamReader = new InputStreamReader(new FileInputStream(readFrom));
+            BufferedReader br = new BufferedReader(streamReader);
+            String line = new String();
+            while (br.ready()) {
+                String tempLine = br.readLine();
+                if (tempLine.contains(username)) {
+                    line = tempLine;
+                }
+            }
+            return line;
+        } catch (Exception exc) {
+            Log.e("Exception", "Unable to fetch last logon. Error: " + exc);
+            return exc.toString();
         }
     }
 }

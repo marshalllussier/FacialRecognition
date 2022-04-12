@@ -49,6 +49,8 @@ public class AlternateloginFragment extends Fragment {
         accounts.put("kamal", "password");
         accounts.put("nick", "password");
         accounts.put("marshall", "password");
+        accounts.put("dianne", "password");
+        accounts.put("hong", "password");
         return view;
     }
 
@@ -63,6 +65,10 @@ public class AlternateloginFragment extends Fragment {
             @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm");
             String formattedDate = dateFormat.format(c.getTime());
             Logon logon = new Logon(userName, formattedDate, getContext());
+            String lastLogonToast = logon.getLastLogon();
+            if (!lastLogonToast.equals("")) {
+                Toast.makeText(requireActivity(), ("You last logged on at: " + logon.getLastLogon()), Toast.LENGTH_LONG).show();
+            }
             logon.logToFile();
             activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LoginhistoryFragment()).commit(); // This will redirect to a different fragment upon successful login
         }
