@@ -58,7 +58,7 @@ public class AlternateloginFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     private void validate(String userName, String userPassword){
         if(accounts.containsKey(userName) && accounts.get(userName).equals(userPassword)){ // temporary
-            Toast.makeText(requireActivity(), "Unlock device", Toast.LENGTH_LONG).show();
+//            Toast.makeText(requireActivity(), "Unlock device", Toast.LENGTH_LONG).show();
             MainActivity activity = (MainActivity) getActivity();
             activity.set_user_logged_in(true);
             Calendar c = Calendar.getInstance();
@@ -67,7 +67,7 @@ public class AlternateloginFragment extends Fragment {
             Logon logon = new Logon(userName, formattedDate, getContext());
             String lastLogonToast = logon.getLastLogon();
             if (!lastLogonToast.equals("")) {
-                Toast.makeText(requireActivity(), ("You last logged on at: " + logon.getLastLogon()), Toast.LENGTH_LONG).show();
+                Toast.makeText(requireActivity(), ("You last logged on at: " + lastLogonToast.substring(lastLogonToast.lastIndexOf("logged in: ") + 11)), Toast.LENGTH_LONG).show(); // This is temporary and needs replaced
             }
             logon.logToFile();
             activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LoginhistoryFragment()).commit(); // This will redirect to a different fragment upon successful login

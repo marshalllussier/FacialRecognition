@@ -42,6 +42,7 @@ public class Logon {
             InputStreamReader streamReader = new InputStreamReader(new FileInputStream(readFrom));
             BufferedReader br = new BufferedReader(streamReader);
             String line = new String();
+            username = username.substring(0, 1).toUpperCase() + username.substring(1);
             while (br.ready()) {
                 String tempLine = br.readLine();
                 if (tempLine.contains(username)) {
