@@ -1,13 +1,17 @@
 package com.autozone.facialrecognition.detection;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.media.Image;
+import android.os.Environment;
 import android.util.Log;
 
 import androidx.camera.core.ImageProxy;
@@ -29,7 +33,10 @@ import org.tensorflow.lite.support.image.ops.ResizeOp;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -39,7 +46,7 @@ public class FaceAnalyzer implements OnSuccessListener<List<Face>> {
     private final DrawType faceDrawType;
     private final PreviewView previewView;
     private InputImage inputImage;
-    private final ImageProxy imageProxy;
+    private ImageProxy imageProxy;
     private final ImageProcessor imageTensorProcessor = new ImageProcessor.Builder()
             .add(new ResizeOp( 112 , 112 , ResizeOp.ResizeMethod.BILINEAR ))
             .add(new NormalizeOp( 112f , 112f ))
@@ -64,26 +71,48 @@ public class FaceAnalyzer implements OnSuccessListener<List<Face>> {
                     ShowFaceBox faceBox = new ShowFaceBox(activity, bounds);           // DRAW FACE BOX
                     previewView.addView(faceBox);
                     try {
-                        System.out.println("uhh");
                         MobileFaceNet model = MobileFaceNet.newInstance(scanfaceFragment.requireContext());
-                        System.out.println("fffff");
-                        // Creates inputs for reference.
-                        if(true) {
 
-                            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{2, 112, 112, 3}, DataType.FLOAT32);
-//                        inputFeature0.loadBuffer(convertBitmapToBuffer(toBitmap(imageProxy.getImage())));
-                            ByteBuffer byteBuffer = convertBitmapToBuffer(toBitmap(imageProxy.getImage()));
-                            Log.d("shape", byteBuffer.toString());
-                            Log.d("shapeffff", inputFeature0.getBuffer().toString());
-                            // Runs model inference and gets result.
-                            MobileFaceNet.Outputs outputs = model.process(inputFeature0);
-                            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
-                            System.out.println(outputFeature0 + " output feature");
-                            // Releases model resources if no longer used.
-                            model.close();
+                        ContextWrapper cw = new ContextWrapper(scanfaceFragment.requireContext());
+                        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+                        File file = new File(directory, "BitmapOfDetectedFace" + ".jpg"); // Creates a image file located at '/data/data/com.autozone.facialrecognition/app_imageDir'
+                        if (!file.exists()) {
+                            FileOutputStream fileOutputStream = null;
+                            try {
+                                fileOutputStream = new FileOutputStream(file);
+                                Bitmap bitmap = toBitmap(imageProxy.getImage());  // Converts image proxy into a initial bitmap
+                                float degrees = 90; //rotation degree
+                                Matrix matrix = new Matrix();
+                                matrix.setRotate(degrees);
+                                Bitmap formattedBitmap = Bitmap.createBitmap(bitmap, (int)bounds.exactCenterX()-150, (int)bounds.exactCenterY()-150, 275, 275, matrix, false); // This takes our initial bitmap and crops it and rotates it. The values for cropping are currently hardcoded but will need to be adjust per-device for resolution.
+//                                Bitmap bitmapToBufferToBitmap = getBitmap(convertBitmapToBuffer(formattedBitmap), 50 ,50); // This converts the formatted bitmap from above into a buffer, and then back into a bitmap and saves it for previewing. Currently it is an unrecognizable image. This is likely where our issues are originating from.
+//                                bitmapToBufferToBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos); // Uncomment line line and comment out the line below to preview the byte buffer
+                                formattedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                                fileOutputStream.flush();
+                                fileOutputStream.close();
+                            } catch (java.io.IOException exc) {
+                                exc.printStackTrace();
+                            }
+
                         }
-                    } catch (IOException e) {
-                        System.out.println("ggggg");
+
+
+
+                        // Creates inputs for reference.
+//                        if(true) {
+//
+//                            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{2, 112, 112, 3}, DataType.FLOAT32);
+////                        inputFeature0.loadBuffer(convertBitmapToBuffer(toBitmap(imageProxy.getImage())));
+//                            ByteBuffer byteBuffer = convertBitmapToBuffer(toBitmap(imageProxy.getImage()));
+//                            // Runs model inference and gets result.
+//                            MobileFaceNet.Outputs outputs = model.process(inputFeature0);
+//                            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+//                            System.out.println(outputFeature0 + " output feature");
+//                            // Releases model resources if no longer used.
+//                            model.close();
+//                        }
+                    } catch (IOException exc) {
+                        exc.printStackTrace();
                     }
                 } else {
                     for (FaceContour faceContour : face.getAllContours()) {               // DRAW CONTOUR POINTS
@@ -127,5 +156,14 @@ public class FaceAnalyzer implements OnSuccessListener<List<Face>> {
         byte[] imageBytes = out.toByteArray();
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
     }
+
+    private Bitmap getBitmap(Buffer buffer, int width, int height) {
+        buffer.rewind();
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bitmap.copyPixelsFromBuffer(buffer);
+        return bitmap;
+    }
+
+
 
 }
