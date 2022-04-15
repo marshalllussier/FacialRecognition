@@ -59,7 +59,7 @@ Connect a physical android device.
 1) Go to the Settings section of an Android phone and click on "About Phone" to display the "Build Number" as shown below.
 ![image](https://user-images.githubusercontent.com/77768342/163280132-f8525517-3743-483e-acf3-c10f4fa81f87.png)
 
-2) Keep clicking build number until this notification shows.
+2) Keep clicking build number until this notification shows. <br>
 ![image](https://user-images.githubusercontent.com/77768342/163280156-0c2bed57-14c0-4fdd-9ff2-9563aad4f1e2.png)
 
 3) Go back to Settings, then go to the "System" section and click on "Developer Options".
