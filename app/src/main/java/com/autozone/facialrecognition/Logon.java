@@ -9,6 +9,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Logon {
     private String username;
@@ -49,7 +52,7 @@ public class Logon {
                     line = tempLine;
                 }
             }
-            return line;
+            return line.split(":", 2)[1];
         } catch (Exception exc) {
             Log.e("Exception", "Unable to fetch last logon. Error: " + exc);
             return exc.toString();

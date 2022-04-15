@@ -67,7 +67,7 @@ public class AlternateloginFragment extends Fragment {
             Logon logon = new Logon(userName, formattedDate, getContext());
             String lastLogonToast = logon.getLastLogon();
             if (!lastLogonToast.equals("")) {
-                Toast.makeText(requireActivity(), ("You last logged on at: " + lastLogonToast.substring(lastLogonToast.lastIndexOf("logged in: ") + 11)), Toast.LENGTH_LONG).show(); // This is temporary and needs replaced
+                Toast.makeText(requireActivity(), ("You last logged on at: " + lastLogonToast), Toast.LENGTH_LONG).show();
             }
             logon.logToFile();
             activity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new LoginhistoryFragment()).commit(); // This will redirect to a different fragment upon successful login
